@@ -1,25 +1,315 @@
-﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29613.14
-MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Program 2.1", "Program 2.1\Program 2.1.csproj", "{9CA232B4-4E3E-4924-9588-7CFEFD0413A7}"
-EndProject
-Global
-	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Any CPU = Debug|Any CPU
-		Release|Any CPU = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{9CA232B4-4E3E-4924-9588-7CFEFD0413A7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9CA232B4-4E3E-4924-9588-7CFEFD0413A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9CA232B4-4E3E-4924-9588-7CFEFD0413A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9CA232B4-4E3E-4924-9588-7CFEFD0413A7}.Release|Any CPU.Build.0 = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {2649E47B-F25E-46B8-A5C9-222C4CFE789F}
-	EndGlobalSection
-EndGlobal
+// R9808
+// Program 2
+// 3/8/2020
+// CIS 199-01
+// Calcualates and displays the tax and tax bracket of the users income, depending on the candidate they select
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace Program_2._1
+{
+    public partial class Form1 : Form
+    {
+        // variables used to hold/display the users tax
+        double currentTax;
+        double tax;
+        
+        public Form1()
+        {
+            InitializeComponent();
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            // baseline                     Marginal tax rates
+            const int BASE_10 = 9700;       const double BASE_RATE_1 = .10;
+            const int BASE_12 = 39_475;     const double BASE_RATE_2 = .12;
+            const int BASE_22 = 84_200;     const double BASE_RATE_3 = .22;
+            const int BASE_24 = 160_725;    const double BASE_RATE_4 = .24;
+            const int BASE_32 = 204_100;    const double BASE_RATE_5 = .32;
+            const int BASE_35 = 510_300;    const double BASE_RATE_6 = .35;
+                                            const double BASE_RATE_7 = .37;
+            // greater than 510300 = 37% tax rate
+
+            //candidates 1 and 3 income     Marginal tax rates                 Special conditions
+            const int C_1n3_10 = 9525;      const double C_1n3_RATE_1 = .10;   const double C_3_REDUCTION = .90;
+            const int C_1n3_15 = 38_700;    const double C_1n3_RATE_2 = .15;   // reduction applies when income < 200_000
+            const int C_1n3_25 = 82_500;    const double C_1n3_RATE_3 = .25;
+            const int C_1n3_28 = 157_500;   const double C_1n3_RATE_4 = .28;
+            const int C_1n3_33 = 200_000;   const double C_1n3_RATE_5 = .33;
+            const int C_1n3_35 = 500_000;   const double C_1n3_RATE_6 = .35;
+                                            const double C_1n3_RATE_7 = .396;
+
+            //candidate 2 income            Marginal tax rates                 Special conditions
+            const int C_2_10 = 9525;        const double C_2_RATE_1 = .10;     const double C_2_REDUCTION = .04;
+            const int C_2_12 = 38_700;      const double C_2_RATE_2 = .12;     // reduction applies when income > 29_000
+            const int C_2_22 = 82_500;      const double C_2_RATE_3 = .22 + .04;
+            const int C_2_24 = 157_500;     const double C_2_RATE_4 = .24 + .04;
+            const int C_2_32 = 200_000;     const double C_2_RATE_5 = .32 + .04;
+            const int C_2_35 = 250_000;     const double C_2_RATE_6 = .35 + .04;
+            const int C_2_40 = 500_000;     const double C_2_RATE_7 = .40 + .04;
+            const int C_2_45 = 2_000_000;   const double C_2_RATE_8 = .45 + .04;
+            const int C_2_50 = 10_000_000;  const double C_2_RATE_9 = .50 + .04;
+                                            const double C_2_RATE_10 = .52 + .04;
+
+            //dummy variables to switch between candidates, values depend on the candidate selected
+            double bracketOne = 0, bracketTwo = 0, bracketThree = 0, bracketFour = 0, bracketFive = 0, bracketSix = 0, bracketSeven = 0, bracketEight = 0, bracketNine = 0,
+                   rateOne = 0,    rateTwo = 0,    rateThree = 0,    rateFour = 0,    rateFive = 0,    rateSix = 0,    rateSeven = 0,    rateEight = 0,    rateNine = 0,     rateTen = 0;
+
+            
+            if (int.TryParse(textBox1.Text, out int inc))
+            {
+                //converts income from int to double to escape potential data loss in calculations
+                double income = inc;
+
+
+
+                // Baseline
+                if (radioButton1.Checked)
+                {
+                    bracketOne = BASE_10;    rateOne = BASE_RATE_1;
+                    bracketTwo = BASE_12;    rateTwo = BASE_RATE_2;
+                    bracketThree = BASE_22;  rateThree = BASE_RATE_3;
+                    bracketFour = BASE_24;   rateFour = BASE_RATE_4;
+                    bracketFive = BASE_32;   rateFive = BASE_RATE_5;
+                    bracketSix = BASE_35;    rateSix = BASE_RATE_6;
+                    bracketSeven = 0;        rateSeven = BASE_RATE_7;
+                    bracketEight = 0;        rateEight = 0;
+                    bracketNine = 0;         rateNine = 0;
+                                             rateTen = 0;
+                }
+                // Candidate 1
+                else if (radioButton2.Checked)
+                {
+                    bracketOne = C_1n3_10;   rateOne = C_1n3_RATE_1;
+                    bracketTwo = C_1n3_15;   rateTwo = C_1n3_RATE_2;
+                    bracketThree = C_1n3_25; rateThree = C_1n3_RATE_3;
+                    bracketFour = C_1n3_28;  rateFour = C_1n3_RATE_4;
+                    bracketFive = C_1n3_33;  rateFive = C_1n3_RATE_5;
+                    bracketSix = C_1n3_35;   rateSix = C_1n3_RATE_6;
+                    bracketSeven = 0;        rateSeven = C_1n3_RATE_7;
+                    bracketEight = 0;        rateEight = 0;
+                    bracketNine = 0;         rateNine = 0;
+                                             rateTen = 0;
+                }
+                //Candidate 2
+                else if (radioButton3.Checked)
+                {
+                    bracketOne = C_2_10;     rateOne = C_2_RATE_1;
+                    bracketTwo = C_2_12;     rateTwo = C_2_RATE_2;
+                    bracketThree = C_2_22;   rateThree = C_2_RATE_3;
+                    bracketFour = C_2_24;    rateFour = C_2_RATE_4;
+                    bracketFive = C_2_32;    rateFive = C_2_RATE_5;
+                    bracketSix = C_2_35;     rateSix = C_2_RATE_6;
+                    bracketSeven = C_2_40;   rateSeven = C_2_RATE_7;
+                    bracketEight = C_2_45;   rateEight = C_2_RATE_8;
+                    bracketNine = C_2_50;    rateNine = C_2_RATE_9;
+                                             rateTen = C_2_RATE_10;
+
+                }
+                //Candidate 3
+                else if (radioButton4.Checked)
+                {
+                    bracketOne = C_1n3_10;   rateOne = C_1n3_RATE_1 * C_3_REDUCTION;
+                    bracketTwo = C_1n3_15;   rateTwo = C_1n3_RATE_2 * C_3_REDUCTION;
+                    bracketThree = C_1n3_25; rateThree = C_1n3_RATE_3 * C_3_REDUCTION;
+                    bracketFour = C_1n3_28;  rateFour = C_1n3_RATE_4 * C_3_REDUCTION;
+                    bracketFive = C_1n3_33;  rateFive = C_1n3_RATE_5 * C_3_REDUCTION;
+                    bracketSix = C_1n3_35;   rateSix = C_1n3_RATE_6;
+                    bracketSeven = 0;        rateSeven = C_1n3_RATE_7;
+                    bracketEight = 0;        rateEight = 0;
+                    bracketNine = 0;         rateNine = 0;
+                                             rateTen = 0;
+                }
+                else
+                    MessageBox.Show("Please check a candidate");
+
+                //the main calculations are done in the body below
+                if (income > 0)
+                {
+                    // bracket 1
+                    if (income > bracketOne)
+                    {
+                        currentTax = bracketOne * rateOne;
+
+                        // bracket 2
+                        if (income > bracketTwo)
+                        {
+                            tax = (bracketTwo - bracketOne) * rateTwo;
+                            currentTax += tax;
+                            // bracket 3
+                            if (income > bracketThree)
+                            {
+                                tax = (bracketThree - bracketTwo) * rateThree;
+                                currentTax += tax;
+                                // bracket 4
+                                if (income > bracketFour)
+                                {
+                                    tax = (bracketFour - bracketThree) * rateFour;
+                                    currentTax += tax;
+                                    // bracket 5
+                                    if (income > bracketFive)
+                                    {
+                                        tax = (bracketFive - bracketFour) * rateFive;
+                                        currentTax += tax;
+                                        // bracket 6
+                                        if (income > bracketSix)
+                                        {
+                                            tax = (bracketSix - bracketFive) * rateSix;
+                                            currentTax += tax;
+                                            if (bracketSeven != 0)
+                                            {
+                                                tax = (bracketSix - bracketFive) * rateSix;
+                                                currentTax += tax;
+                                                // bracket 7
+                                                // every calculation after this would only apply to candidate 2
+                                                if (income > bracketSeven)
+                                                {
+                                                    tax = (bracketSeven - bracketSix) * rateSeven;
+                                                    currentTax += tax;
+                                                    // bracket 8
+                                                    if (income > bracketEight)
+                                                    {
+                                                        tax = (bracketEight - bracketSeven) * rateEight;
+                                                        currentTax += tax;
+                                                        // bracket 9
+                                                        if (income > bracketNine)
+                                                        {
+                                                            // bracket 10
+                                                            tax = (income - bracketNine) * rateTen;
+                                                            currentTax += tax;
+                                                            MessageBox.Show($"Tax due: {currentTax.ToString("C")} ({rateTen.ToString("P")})");
+                                                        }
+                                                        else
+                                                        {
+                                                            tax = (income - bracketEight) * rateNine;
+                                                            currentTax += tax;
+                                                            MessageBox.Show($"Tax due: {currentTax.ToString("C")} ({rateNine.ToString("P")})");
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        tax = (income - bracketSeven) * rateEight;
+                                                        currentTax += tax;
+                                                        MessageBox.Show($"Tax due: {currentTax.ToString("C")} ({rateEight.ToString("P")})");
+                                                    }
+                                                }
+                                                else
+                                                    MessageBox.Show($"fix me {currentTax.ToString("C")}");
+                                            }
+                                            else
+                                            {
+                                                // when not candidate 2
+                                                tax = (income - bracketSix) * rateSeven;
+                                                currentTax += tax;
+                                                MessageBox.Show($"Tax due: {currentTax.ToString("C")} ({rateSeven.ToString("P")})");
+
+                                            }
+                                        }
+                                        else
+                                        {
+                                            tax = (income - bracketFive) * rateSix;
+                                            currentTax += tax;
+                                            MessageBox.Show($"Tax due: {currentTax.ToString("C")} ({rateSix.ToString("P")})");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        tax = (income - bracketFour) * rateFive;
+                                        currentTax += tax;
+                                        MessageBox.Show($"Tax due: {currentTax.ToString("C")} ({rateFive.ToString("P")})");
+
+                                    }
+                                }
+                                else
+                                {
+                                    tax = (income - bracketThree) * rateFour;
+                                    currentTax += tax;
+                                    MessageBox.Show($"Tax due: {currentTax.ToString("C")} ({rateFour.ToString("P")})");
+
+                                }
+                            }
+                            else
+                            {
+                                tax = (income - bracketTwo) * rateThree;
+                                currentTax += tax;
+                                MessageBox.Show($"Tax due: {currentTax.ToString("C")} ({rateThree.ToString("P")})");
+
+                            }
+                        }
+                        else
+                        {
+                            //special condition for candidate two \/
+                            if (radioButton3.Checked)
+                            {
+                                if (income > 29_000)
+                                {
+                                    tax = (income - bracketOne) * (rateTwo + .04);
+                                    currentTax += tax;
+                                    MessageBox.Show($"Tax due: {currentTax.ToString("C")} ({rateTwo.ToString("P")})");
+                                }
+                                else
+                                {
+                                    tax = (income - bracketOne) * rateTwo;
+                                    currentTax += tax;
+                                    MessageBox.Show($"Tax due: {currentTax.ToString("C")} ({rateTwo.ToString("P")})");
+                                }
+                            }
+                            //special condition for candidate two /\
+                            else
+                            {
+                                tax = (income - bracketOne) * rateTwo;
+                                currentTax += tax;
+                                MessageBox.Show($"Tax due: {currentTax.ToString("C")} ({rateTwo.ToString("P")})");
+                            }
+                        }
+                    }
+                    else
+                    {
+                        tax = income * rateOne;
+                        currentTax = tax;
+                        MessageBox.Show($"Tax due: {currentTax.ToString("C")} ({rateOne.ToString("P")})");
+
+                    }
+                }
+                else
+                    MessageBox.Show("Please enter valid income");
+            }
+            else
+                MessageBox.Show("Please enter a valid income");
+           
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void radioButton1_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void radioButton2_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void radioButton3_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void radioButton4_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+    }
+}
