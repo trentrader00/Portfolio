@@ -1,25 +1,162 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29806.167
-MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Prog3", "Prog3\Prog3.csproj", "{C5744805-2A2F-46BC-BB16-93E3D3D42800}"
-EndProject
-Global
-	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Any CPU = Debug|Any CPU
-		Release|Any CPU = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{C5744805-2A2F-46BC-BB16-93E3D3D42800}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C5744805-2A2F-46BC-BB16-93E3D3D42800}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C5744805-2A2F-46BC-BB16-93E3D3D42800}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C5744805-2A2F-46BC-BB16-93E3D3D42800}.Release|Any CPU.Build.0 = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {70754D95-9CA2-4BBD-B099-6D54CBE22107}
-	EndGlobalSection
-EndGlobal
+// R9808
+// program 3
+// April 2
+// CIS 199-01
+// This application calculates the marginal tax rate
+// for various candidates' tax plans.
+
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace Prog3
+{
+    public partial class Prog3Form : Form
+    {
+        public Prog3Form()
+        {
+            InitializeComponent();
+        }
+        
+        // User has clicked the Calculate Tax button
+        // Will calculate and display their marginal tax rate
+        private void calcTaxBtn_Click(object sender, EventArgs e)
+        {
+            // The marginal tax rates
+            // Baseline
+            const decimal BASE_RATE1 = .10m; // 1st tax rate (LOWEST)
+            const decimal BASE_RATE2 = .12m; // 2nd tax rate
+            const decimal BASE_RATE3 = .22m; // 3rd tax rate
+            const decimal BASE_RATE4 = .24m; // 4th tax rate
+            const decimal BASE_RATE5 = .32m; // 5th tax rate
+            const decimal BASE_RATE6 = .35m; // 6th tax rate
+            const decimal BASE_RATE7 = .37m; // 7th tax rate (HIGHEST)
+
+            // Candidate 2
+            const decimal C2_RATE1 = .10m;  // 1st tax rate (LOWEST)
+            const decimal C2_RATE2 = .12m;  // 2nd tax rate
+            const decimal C2_RATE3 = .22m;  // 3rd tax rate
+            const decimal C2_RATE4 = .24m;  // 4th tax rate
+            const decimal C2_RATE5 = .32m;  // 5th tax rate
+            const decimal C2_RATE6 = .35m;  // 6th tax rate
+            const decimal C2_RATE7 = .40m;  // 7th tax rate
+            const decimal C2_RATE8 = .45m;  // 8th tax rate
+            const decimal C2_RATE9 = .50m;  // 9th tax rate
+            const decimal C2_RATE10 = .52m; // 10th tax rate (HIGHEST)
+
+            // Taxable income thresholds for each candidate
+            // Baseline
+            const int BASE_THRESH1 = 9_700 + 1;   // 1st baseline threshold (LOWEST)
+            const int BASE_THRESH2 = 39_475 + 1;  // 2nd baseline threshold
+            const int BASE_THRESH3 = 84_200 + 1;  // 3rd baseline threshold
+            const int BASE_THRESH4 = 160_725 + 1; // 4th baseline threshold
+            const int BASE_THRESH5 = 204_100 + 1; // 5th baseline threshold
+            const int BASE_THRESH6 = 510_300 + 1; // 6th baseline threshold (HIGHEST)
+
+            // Candidate 2
+            const int C2_THRESH1 = 9_525 + 1;     // 1st threshold (LOWEST)
+            const int C2_THRESH2 = 38_700 + 1;    // 2nd threshold
+            const int C2_THRESH3 = 82_500 + 1;    // 3rd threshold
+            const int C2_THRESH4 = 157_500 + 1;   // 4th threshold
+            const int C2_THRESH5 = 200_000 + 1;   // 5th threshold
+            const int C2_THRESH6 = 250_000 + 1;   // 6th threshold
+            const int C2_THRESH7 = 500_000 + 1;   // 7th threshold
+            const int C2_THRESH8 = 2_000_000 + 1;  // 8th threshold
+            const int C2_THRESH9 = 10_000_000 + 1; // 9th threshold (HIGHEST)
+
+
+            int income; // Filer's taxable income (input)
+            int index;  // index used to link parallel arrays          
+            decimal marginalRate = .0m; // Filer's calculated marginal tax rate
+
+            decimal[] rates = new decimal[0]; // initializing rates array
+            int[] thresholds = new int[0]; //initializing thresholds array
+            if (int.TryParse(incomeTxt.Text, out income) && income >= 0)
+            {
+                
+                // Which rates/thresholds apply to this filer?
+                if (baselineRdoBtn.Checked) // Baseline?
+                {
+                    //setting size and values for array's rates and thresholds for baseline
+                    rates = new decimal[7]; 
+                    thresholds = new int[7];
+
+                    rates[0] = BASE_RATE1;
+                    rates[1] = BASE_RATE2;
+                    rates[2] = BASE_RATE3;
+                    rates[3] = BASE_RATE4;
+                    rates[4] = BASE_RATE5;
+                    rates[5] = BASE_RATE6;
+                    rates[6] = BASE_RATE7;
+
+                    thresholds[0] = 0;
+                    thresholds[1] = BASE_THRESH1;
+                    thresholds[2] = BASE_THRESH2;
+                    thresholds[3] = BASE_THRESH3;
+                    thresholds[4] = BASE_THRESH4;
+                    thresholds[5] = BASE_THRESH5;
+                    thresholds[6] = BASE_THRESH6;
+                }
+                else // Must be Candidate 2
+                {
+                    //setting size and values for array's rates and thresholds for candidate 2
+                    rates = new decimal[10];
+                    thresholds = new int[10];
+
+                    rates[0] = C2_RATE1;
+                    rates[1] = C2_RATE2;
+                    rates[2] = C2_RATE3;
+                    rates[3] = C2_RATE4;
+                    rates[4] = C2_RATE5;
+                    rates[5] = C2_RATE6;
+                    rates[6] = C2_RATE7;
+                    rates[7] = C2_RATE8;
+                    rates[8] = C2_RATE9;
+                    rates[9] = C2_RATE10;
+
+                    thresholds[0] = 0;
+                    thresholds[1] = C2_THRESH1;
+                    thresholds[2] = C2_THRESH2;
+                    thresholds[3] = C2_THRESH3;
+                    thresholds[4] = C2_THRESH4;
+                    thresholds[5] = C2_THRESH5;
+                    thresholds[6] = C2_THRESH6;
+                    thresholds[7] = C2_THRESH7;
+                    thresholds[8] = C2_THRESH8;
+                    thresholds[9] = C2_THRESH9;
+                }
+
+                bool found = false;
+                index = thresholds.Length - 1;
+                // Calculate income tax due and find their marginal rate
+                while (index >= 0 && !found)
+                {
+                    if (income >= thresholds[index])
+                        found = true;
+                    else
+                        --index;
+                }
+                if (found)
+                    marginalRate = rates[index];
+                
+
+                // Output results
+                marginalRateOutLbl.Text = $"{marginalRate:P1}";
+            }
+            else // Invalid input
+                MessageBox.Show("Enter valid income!");
+        }
+
+        private void Prog3Form_Load(object sender, EventArgs e)
+        {
+
+        }
+    }
+}
