@@ -1,25 +1,51 @@
-﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29613.14
-MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Program 4", "Program 4\Program 4.csproj", "{3C00A48D-5457-43EC-B6C3-4E2FF738AFB4}"
-EndProject
-Global
-	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Any CPU = Debug|Any CPU
-		Release|Any CPU = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{3C00A48D-5457-43EC-B6C3-4E2FF738AFB4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3C00A48D-5457-43EC-B6C3-4E2FF738AFB4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3C00A48D-5457-43EC-B6C3-4E2FF738AFB4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3C00A48D-5457-43EC-B6C3-4E2FF738AFB4}.Release|Any CPU.Build.0 = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {67B3060F-006B-451B-9534-29F04B3820CB}
-	EndGlobalSection
-EndGlobal
+//R9808
+//Program 4
+//4/20/20
+//CIS-199-01
+using System;
+
+namespace Program_4
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            //create class objects & initialize their values
+            //values = origin zip, destination zip, length, width, height, weight
+            GroundPackage[] packageList = new GroundPackage[6];
+            packageList[0] = new GroundPackage(40220, 60660, 5.2, 8.6, 7.4, 5.7);
+            packageList[1] = new GroundPackage(45682, 14545, 4.6, 23.6, 3.6, 23.8);
+            packageList[2] = new GroundPackage(65842, 32459, 4.6, 5.8, 18.4, 90.1);
+            packageList[3] = new GroundPackage(57035, 95443, 54.8, 21.5, 12.9, 184);
+            packageList[4] = new GroundPackage(65126, 35489, 4.8, 8.6, 9.4, 11);
+            packageList[5] = new GroundPackage(26384, 74130, 10, 12, 15.3, 40);
+
+            Console.WriteLine("---------------------");
+            Console.WriteLine("Package List: ");
+            Console.WriteLine("---------------------");
+            DisplayPackages(packageList);
+
+            //changes certain data about certain packages
+            packageList[0].Length += 1;
+            packageList[1].Width += 2;
+            packageList[2].Height += 3;
+            packageList[3].Weight += 4;
+            packageList[4].Length += 5;
+            packageList[5].Width += 6;
+
+            Console.WriteLine("---------------------");
+            Console.WriteLine("After changes: ");
+            Console.WriteLine("---------------------");
+            DisplayPackages(packageList);
+        }
+
+        //method to display all packages
+        //Precondition: all package information is valid and properly formatted
+        //Postcondition: all package information is displayed to user
+        public static void DisplayPackages(GroundPackage[] packages) 
+        {
+            for (int x = 0; x < packages.Length; ++x)
+                Console.WriteLine($"Package {x}:{Environment.NewLine}" + $"{packages[x].ToString()}" + $"Cost:            ${packages[x].CalcCost()}{Environment.NewLine}");
+        }
+    }
+}
